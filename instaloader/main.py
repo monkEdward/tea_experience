@@ -5,6 +5,7 @@
 import time
 from datetime import datetime
 from os import walk
+from pathlib import Path
 
 from instaloader import instaloader
 
@@ -27,7 +28,6 @@ def init():
     L = instaloader.Instaloader(download_videos=False, download_video_thumbnails=False, compress_json=False,
                                 save_metadata=False, rate_controller=lambda ctx: MyRateController(ctx))
     L.login('', '')
-    static_url = './raw_data'
     sellers = ['teasnsuch', 'woashwellness', 'shopteappo', 'alldayteaclub', 'tejanateas', 'teapigs', 'dualinnovation_nl',
                'natureinyou.eu', 'thejadeleaf', 'drinkreddiamond', 'tapalofficial', 'sdcoffeetea', 'myteabrk',
                'drinkmilos', 'mightyleaftea', 'tavalontea', 'tazo', 'waghbakritea.official', 'zarutea', 'yogitea',
@@ -77,8 +77,8 @@ def init():
                'herbea.cz', 'pangeatea.cz']
     for seller in sellers:
         posts = instaloader.Profile.from_username(L.context, seller).get_posts()
-        seller_url = f'{static_url}/{seller}'
-        filenames = next(walk(seller_url), (None, None, []))[2]
+        path_seller = Path('raw_data', seller)
+        filenames = next(walk(path_seller), (None, None, []))[2]
         SINCE = datetime(2015, 5, 1)
         UNTIL = datetime(2015, 3, 1)
         # takewhile(lambda p: p.date > UNTIL, dropwhile(lambda p: p.date > SINCE, posts)):
@@ -88,7 +88,7 @@ def init():
                 if download_file in filenames:
                     print('Already Downloaded!')
                 else:
-                    L.download_post(post, seller_url)
+                    L.download_post(post, path_seller)
 
 
 # Press the green button in the gutter to run the script.

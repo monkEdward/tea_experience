@@ -1,9 +1,8 @@
-from torch.utils.data.dataloader import DataLoader
-from torch.utils.data import random_split
 import torch.nn.functional as F
 import torch.nn as nn
 import time as T
 import torch
+import os
 
 batch_size = 64
 val_size = 20
@@ -147,3 +146,37 @@ def model_creation(train_ds, validation_ds):
     history = fit(num_epochs, learning_rate, model, train_ds, validation_ds, opt_func)
 
     return model, history
+
+def save_model(model):
+    # bpath = 'D:\Improve\tea_experience_project\tea_experience\TEX_v1\model\trained\'
+    # os.mkdir(bpath)
+    # model_path = os.path.join(bpath, 'tea_experience_model_v1.pth')
+    torch.save(model.state_dict(), 'tea_experience_model_v1.pth')
+
+
+def to_device(data, device):
+
+    "Move data to the device"
+    if isinstance(data, (list, tuple)):
+        return [to_device(x, device) for x in data]
+
+    return data.to(device, non_blocking=True)
+
+
+def predict_class(img, model, dataset):
+    """ Predict the class of image and Return Predicted Class"""
+    device = 'cpu'
+
+    img = to_device(img.unsqueeze(0), device)
+    prediction = model(img)
+    _, preds = torch.max(prediction, dim=1)
+
+    return dataset.classes[preds[0].item()]
+
+def load_model():
+    path = 'D:\Improve\tea_experience_project\tea_experience\TEX_v1\model\trained\tea_experience_model_v1.pth'
+
+    model = TeaObjectRelatedClassifierCNN()
+    model.load_state_dict(torch.load(path))
+
+    return model

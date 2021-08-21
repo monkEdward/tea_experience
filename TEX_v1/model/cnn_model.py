@@ -5,7 +5,7 @@ import torch
 import os
 
 batch_size = 64
-val_size = 20
+val_size = 100
 
 class Eta:
 
